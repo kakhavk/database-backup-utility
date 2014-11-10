@@ -7,7 +7,7 @@ define('DBUSER','username');
 define('DBPASS','password');
 define('DBNAME','databasename');
 
-$dbType="pgsql";
+$dbType="mysql";
 $osType="linux";
 $backupPath="/tmp/";
 

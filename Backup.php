@@ -15,6 +15,11 @@ class Backup{
 	function __construct(){
 		;
 	}
+	
+    /* Returns Database Type: mysql or pgsql */
+    function retDbType(){
+        return $this->dbType;
+    }
     
     /* Sets Database Type: mysql or pgsql */
     function setDbType($dbType){
@@ -25,20 +30,16 @@ class Backup{
         $this->dbType=$dbtype;
     }
     
-    /* Returns Database Type: mysql or pgsql */
-    function retDbType(){
-        return $this->dbType;
-    }
-    
-    
+    /* Return backup archvie type: zip or gzip */
     function retBackupType(){
         return $this->backupType;
     }
-    
+    /* Set backup archvie type: zip or gzip */
     function setBackupType($backupType){
         $this->backupType=$backupType;
     }
 	
+    /* Download file */
     function downFile($file, $fileNm, $ctype) {
         if (file_exists($file)) {
             if(ob_get_level()!==0) ob_clean();
@@ -52,7 +53,7 @@ class Backup{
         }
 
     }
-    
+    /* Backup database and download */
 	function save($backupPath, $osType='linux'){
 		
 		$dbhost = DBHOST;

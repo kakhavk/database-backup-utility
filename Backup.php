@@ -5,7 +5,8 @@
 # Writen By Kakhaber Kashmadze <info@soft.ge>
 # Licensed under MIT License
 
-# This version on Linux works with archive type: zip and gz, on Windows with archive type: zip 
+# This version on Linux works with archive type: zip and gz, on Windows with archive type: zip ,
+# and works with databases MySQL and PostgreSQL, also is possible customize for other database types.
 # On windows environment variable path must be set for mysqldump and pg_dump
 
 class Backup{

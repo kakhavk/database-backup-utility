@@ -69,7 +69,7 @@ class Backup{
 		$backup_file=$backup_path.$fileName;
 		
 		if($this->retDbType()=='mysql'){
-			$conn=mysql_connect($dbhost,$dbuser,$dbpass);
+			$conn=@mysql_connect($dbhost,$dbuser,$dbpass);
 			if(!$conn){
 				echo "Error when connecting to server";
 				return false;
@@ -78,7 +78,7 @@ class Backup{
 				return false;
 			}
 		}elseif($this->retDbType()=='pgsql'){
-			$conn=pg_pconnect("host=".$dbhost." port=5432 dbname=".$dbname." user=".$dbuser." password=".$dbpass."");
+			$conn=@pg_pconnect("host=".$dbhost." port=5432 dbname=".$dbname." user=".$dbuser." password=".$dbpass."");
 			if(!$conn){
 				echo "Error when connecting to database";
 				return false;

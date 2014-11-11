@@ -11,7 +11,7 @@
 
 class Backup{
 	
-    private $dbType=''; /* By default database type is mysql. Allowed types for mysql is mysql, for postgresql is pgsql */
+    private $dbType='mysql'; /* By default database type is mysql. Allowed types for mysql is mysql, for postgresql is pgsql */
     private $backupType='zip'; /* By default archive type is zip. In this version allowed types on linux is zip, gzip, on windows zip */
     
 	function __construct(){

@@ -5,12 +5,13 @@
 # Writen By Kakhaber Kashmadze <info@soft.ge>
 # Licensed under MIT License
 
-# This version is for linux server
+# This version on Linux works with archive type: zip and gz, on Windows with archive type: zip 
+# On windows environment variable path must be set for mysqldump and pg_dump
 
 class Backup{
 	
-    private $dbType; /* mysql, pgsql */
-    private $backupType='gzip';
+    private $dbType='mysql'; /* By default database type = mysql. Allowed types for mysql is mysql, for postgresql is pgsql */
+    private $backupType='zip'; /* By default archive type is zip. In this version allowed types on linux is zip, gzip, on windows zip */
     
 	function __construct(){
 		;
@@ -129,9 +130,54 @@ class Backup{
                        echo "\nError";
                        return false;
                     }
-            }           
+            }
+
             
-		}        
+            
+		}elseif($osType=='windows'){
+            
+            if($this->retDbType()=='mysql')
+                $command = "mysqldump --opt -h ".$dbhost." -u ".$dbuser." -p".$dbpass." ".$dbname." > ".$backup_file;
+            elseif($this->retDbType()=='pgsql'){
+                exec("set PGPASSWORD=".$dbpass);
+                $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." | > ".$backup_file;
+            }
+            
+			exec($command);
+            
+            if($this->retBackupType()=='zip'){
+                $backupFileZip=$backup_file.'.zip';
+                $downloadFileName=$fileName.'.zip';
+                
+                if(fopen($backup_file, "r")){
+                    
+                    if(filesize($backup_file)>0){
+                        
+                        $zip = new ZipArchive;
+                        if ($zip->open($backupFileZip, ZipArchive::CREATE) === TRUE) {
+                            $zip->addFile($backup_file, $backupFileZip);
+                            $zip->close();
+                            
+                            unlink($backup_file);
+                            $this->downFile($backupFileZip, $downloadFileName, "application/zip");
+                        }else{
+                            echo "\nError: size file has not created ";
+                            return false;
+                        }
+                        
+
+                        
+                    }else{
+                        echo "\nError: size of file is ".filesize($backup_file);
+                        return false;
+                    }
+                }else{
+                   echo "\nError";
+                   return false;
+                }
+            
+            }
+		}
 		return false;
 	}
 

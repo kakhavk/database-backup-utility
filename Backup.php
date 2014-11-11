@@ -56,7 +56,7 @@ class Backup{
 
     }
     /* Backup database and download */
-	function save($backupPath, $osType='linux'){
+    function save($backupPath, $osType='linux'){
 		
 		$dbhost = DBHOST;
 		$dbuser = DBUSER;

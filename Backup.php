@@ -1,24 +1,33 @@
 <?php
-
 # Database Database Backup class
-# Version 1.0
+# Version 1.1
 # Writen By Kakhaber Kashmadze <info@soft.ge>
 # Licensed under MIT License
 
-# This version on Linux works with archive type: zip and gzip, on Windows with archive type: zip ,
-# and works with databases MySQL and PostgreSQL, also is possible customize for other database types.
-# On windows environment variable path must be set for mysqldump and pg_dump
+# This version on Linux works with archive type gzip and with databases MySQL and PostgreSQL, also is possible customize for other database types or archive.
+# On windows environment path variable must be set for mysqldump and pg_dump
 
 class Backup{
 	
     private $dbType='mysql'; /* By default database type is mysql. Allowed types for mysql is mysql, for postgresql is pgsql */
-    private $backupType='zip'; /* By default archive type is zip. In this version allowed types on linux is zip, gzip, on windows zip */
+    private $backupType='gzip'; /* Type of archive */
+    private $dbParams=array("host","user","password","database"); /* Database parameters */
     
 	function __construct(){
 		;
 	}
 	
-    /* Returns Database Type: mysql or pgsql */
+	/* Return database parameters */
+	function retDbParams(){
+		return $this->dbParams;
+	}
+	
+	/* Set database parameters */
+	function setDbParams($dbParams){
+		$this->dbParams=$dbParams;
+	}
+	
+    /* Returns Database Type */
     function retDbType(){
         return $this->dbType;
     }
@@ -32,11 +41,11 @@ class Backup{
         $this->dbType=$dbtype;
     }
     
-    /* Return backup archvie type: zip or gzip */
+    /* Return backup archvie type */
     function retBackupType(){
         return $this->backupType;
     }
-    /* Set backup archvie type: zip or gzip */
+    /* Set backup archvie type */
     function setBackupType($backupType){
         $this->backupType=$backupType;
     }
@@ -56,12 +65,14 @@ class Backup{
 
     }
     /* Backup database and download */
-    function save($backupPath, $osType='linux'){
+    function save($backupPath){
 		
-		$dbhost = DBHOST;
-		$dbuser = DBUSER;
-		$dbpass = DBPASS;
-		$dbname = DBNAME;
+    	$dbparams=$this->retDbParams();
+    	
+		$dbhost = $dbparams[0];
+		$dbuser = $dbparams[1];
+		$dbpass = $dbparams[2];
+		$dbname = $dbparams[3];
 		
         
 		$backup_path=$backupPath;
@@ -85,117 +96,47 @@ class Backup{
 			}
 		}
 		
-		if($osType=='linux'){
-        
-            if($this->retBackupType()=='gzip'){
-                $backup_file = $backup_file. '.gz';
-                
-                
-                
-                if($this->retDbType()=='mysql')
-                    $command = "mysqldump --opt -h ".$dbhost." -u ".$dbuser." -p".$dbpass." ".$dbname." | gzip > ".$backup_file;
-                elseif($this->retDbType()=='pgsql'){
-                    system("export PGPASSWORD=".$dbpass);
-                    $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." | gzip > ".$backup_file;
-                }
-                system($command);
-
-                        
-                if(fopen($backup_file, "r")){
-                   $fileName=$fileName.'.gz';
-                   $this->downFile($backup_file, $fileName, "application/x-gzip");               
-                   return true;
-                }else{
-                   echo "<br />Error saving file ".$backup_file;
-                }            
-            }elseif($this->retBackupType()=='zip'){
-                
-                    if($this->retDbType()=='mysql')
-                        $command = "mysqldump --opt -h ".$dbhost." -u ".$dbuser." -p".$dbpass." ".$dbname." > ".$backup_file;
-                    elseif($this->retDbType()=='pgsql'){
-                        system("export PGPASSWORD=".$dbpass);
-                        $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." > ".$backup_file;
-                    }
-                    
-                    system($command);
-
-                    $backupFileZip=$backup_file.'.zip';
-                    $downloadFileName=$fileName.'.zip';
-                    
-                    if(fopen($backup_file, "r")){
-                        
-                        if(filesize($backup_file)>0){
-                            
-                            $zip = new ZipArchive;
-                            if ($zip->open($backupFileZip, ZipArchive::CREATE) === TRUE) {
-                                $zip->addFile($backup_file, $fileName);
-                                $zip->close();
-                                
-                                unlink($backup_file);
-                                $this->downFile($backupFileZip, $downloadFileName, "application/zip");
-                            }else{
-                                echo "\nError: size file has not created ";
-                                return false;
-                            }
-                            
-
-                            
-                        }else{
-                            echo "\nError: size of file is ".filesize($backup_file);
-                            return false;
-                        }
-                    }else{
-                       echo "\nError";
-                       return false;
-                    }
-            }
-
-            
-            
-		}elseif($osType=='windows'){
             
             if($this->retDbType()=='mysql')
                 $command = "mysqldump --opt -h ".$dbhost." -u ".$dbuser." -p".$dbpass." ".$dbname." > ".$backup_file;
             elseif($this->retDbType()=='pgsql'){
-                exec("set PGPASSWORD=".$dbpass);
-                $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." | > ".$backup_file;
-            }
-            
+            	if(!stristr(PHP_OS, 'WIN')) exec("export PGPASSWORD=".$dbpass);            		            	
+                else exec("set PGPASSWORD=".$dbpass);
+                $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." > ".$backup_file;
+            }            
 			exec($command);
-            
-            if($this->retBackupType()=='zip'){
-                $backupFileZip=$backup_file.'.zip';
-                $downloadFileName=$fileName.'.zip';
-                
-                if(fopen($backup_file, "r")){
-                    
-                    if(filesize($backup_file)>0){
-                        
-                        $zip = new ZipArchive;
-                        if ($zip->open($backupFileZip, ZipArchive::CREATE) === TRUE) {
-                            $zip->addFile($backup_file, $backupFileZip);
-                            $zip->close();
-                            
-                            unlink($backup_file);
-                            $this->downFile($backupFileZip, $downloadFileName, "application/zip");
-                        }else{
-                            echo "\nError: size file has not created ";
-                            return false;
-                        }
-                        
-
-                        
-                    }else{
-                        echo "\nError: size of file is ".filesize($backup_file);
-                        return false;
-                    }
-                }else{
-                   echo "\nError";
-                   return false;
-                }
-            
-            }
-		}
+			
+			if(filesize($backup_file)<=0) {
+				echo "\nError: size of file is ".filesize($backup_file);
+				return false;
+			}
+			if($this->retBackupType()=='gzip'){
+				$backupFileGzip=$backup_file.'.gz';
+				$downloadFileName=$fileName.'.gz';
+				$fp=fopen($backup_file, "rb");
+				if($fp){
+			
+					if(filesize($backup_file)>0){
+			
+						$gz = gzopen($backupFileGzip,'wb9');
+						while (!feof($fp)) {
+							gzwrite($gz, fread($fp, 8096));
+						}
+						
+						unlink($backup_file);
+						fclose($fp);
+						gzclose($gz);
+						$this->downFile($backupFileGzip, $downloadFileName, "application/x-gzip");
+					}else{
+						echo "\nError: size of file is ".filesize($backup_file);
+						return false;
+					}
+				}else{
+					echo "\nError";
+					return false;
+				}
+			
+			}
 		return false;
 	}
 

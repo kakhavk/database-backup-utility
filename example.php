@@ -1,19 +1,10 @@
 <?php
+ini_set("display_errors", 1);
 require_once "Backup.php";
 $backupCls=new Backup();
 
-define('DBHOST','localhost');
-define('DBUSER','username');
-define('DBPASS','password');
-define('DBNAME','databasename');
-
-$dbType="mysql";
-$osType="linux";
-$backupPath="/tmp/";
-/* For example in MS Windows backup path must be C:\Windows\Temp, or other path where is located temporary files */
-
-
-$backupCls->setDbType($dbType);
-$backupCls->setBackupType('gzip');
-$backupCls->save($backupPath, $osType);
+$dbParams=array("localhost","username","password","databasename");
+$backupCls->setDbParams($dbParams);
+$backupCls->setDbType("MySQL");
+$backupCls->save("/tmp/"); /* For MS Windows backup path maybe C:\Windows\Temp, or other path where is located temporary files */
 ?>

@@ -7,7 +7,7 @@
 # This version on Linux works with archive type gzip and with databases MySQL and PostgreSQL.
 # On windows environment path variable must be set for mysqldump and pg_dump
 
-class Backup{
+class SqlDump{
 	
     private $dbType='mysql'; /* By default database type is mysql. Allowed types for mysql is mysql, for postgresql is pgsql */
     private $backupType='gzip'; /* Type of archive */

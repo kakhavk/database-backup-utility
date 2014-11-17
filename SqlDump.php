@@ -1,5 +1,5 @@
 <?php
-# Database Database Backup class
+# Database Database Dump class
 # Version 1.1
 # Writen By Kakhaber Kashmadze <info@soft.ge>
 # Licensed under MIT License
@@ -10,7 +10,7 @@
 class SqlDump{
 	
     private $dbType='mysql'; /* By default database type is mysql. Allowed types for mysql is mysql, for postgresql is pgsql */
-    private $backupType='gzip'; /* Type of archive */
+    private $dumpType='gzip'; /* Type of archive */
     private $dbParams=array("host","user","password","database"); /* Database parameters */
     
 	function __construct(){
@@ -41,13 +41,13 @@ class SqlDump{
         $this->dbType=$dbtype;
     }
     
-    /* Return backup archvie type */
-    function retBackupType(){
-        return $this->backupType;
+    /* Return dump archvie type */
+    function retDumpType(){
+        return $this->dumpType;
     }
-    /* Set backup archvie type */
-    function setBackupType($backupType){
-        $this->backupType=$backupType;
+    /* Set dump archvie type */
+    function setDumpType($dumpType){
+        $this->dumpType=$dumpType;
     }
 	
     /* Download file */
@@ -64,8 +64,8 @@ class SqlDump{
         }
 
     }
-    /* Backup database and download */
-    function save($backupPath){
+    /* Dump database and download */
+    function save($dumpPath){
 		
     	$dbparams=$this->retDbParams();
     	
@@ -75,9 +75,9 @@ class SqlDump{
 		$dbname = $dbparams[3];
 		
         
-		$backup_path=$backupPath;
+		$dump_path=$dumpPath;
 		$fileName=$dbname."_".date("Y-m-d-H-i-s").".sql";		
-		$backup_file=$backup_path.$fileName;
+		$dump_file=$dump_path.$fileName;
 		
 		if($this->retDbType()=='mysql'){
 			$conn=@mysql_connect($dbhost,$dbuser,$dbpass);
@@ -98,37 +98,37 @@ class SqlDump{
 		
             
             if($this->retDbType()=='mysql')
-                $command = "mysqldump --opt -h ".$dbhost." -u ".$dbuser." -p".$dbpass." ".$dbname." > ".$backup_file;
+                $command = "mysqldump --opt -h ".$dbhost." -u ".$dbuser." -p".$dbpass." ".$dbname." > ".$dump_file;
             elseif($this->retDbType()=='pgsql'){
             	if(!stristr(PHP_OS, 'WIN')) exec("export PGPASSWORD=".$dbpass);            		            	
                 else exec("set PGPASSWORD=".$dbpass);
-                $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." > ".$backup_file;
+                $command = "pg_dump -h ".$dbhost." -U ".$dbuser." ".$dbname." > ".$dump_file;
             }            
 			exec($command);
 			
-			if(filesize($backup_file)<=0) {
-				echo "\nError: size of file is ".filesize($backup_file);
+			if(filesize($dump_file)<=0) {
+				echo "\nError: size of file is ".filesize($dump_file);
 				return false;
 			}
-			if($this->retBackupType()=='gzip'){
-				$backupFileGzip=$backup_file.'.gz';
+			if($this->retDumpType()=='gzip'){
+				$dumpFileGzip=$dump_file.'.gz';
 				$downloadFileName=$fileName.'.gz';
-				$fp=fopen($backup_file, "rb");
+				$fp=fopen($dump_file, "rb");
 				if($fp){
 			
-					if(filesize($backup_file)>0){
+					if(filesize($dump_file)>0){
 			
-						$gz = gzopen($backupFileGzip,'wb9');
+						$gz = gzopen($dumpFileGzip,'wb9');
 						while (!feof($fp)) {
 							gzwrite($gz, fread($fp, 8096));
 						}
 						
-						unlink($backup_file);
+						unlink($dump_file);
 						fclose($fp);
 						gzclose($gz);
-						$this->downFile($backupFileGzip, $downloadFileName, "application/x-gzip");
+						$this->downFile($dumpFileGzip, $downloadFileName, "application/x-gzip");
 					}else{
-						echo "\nError: size of file is ".filesize($backup_file);
+						echo "\nError: size of file is ".filesize($dump_file);
 						return false;
 					}
 				}else{

@@ -1,7 +1,7 @@
-dbbackup-mysql-postgresql
+Sqldump utility for MySQL and PostgreSQL Databases
 =========================
 
-Backup Database from MySQL or PostgreSQL, also possible to customize for other types of databases.
+Backup Database from MySQL or PostgreSQL.
 
 See example.php
 

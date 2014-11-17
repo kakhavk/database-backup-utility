@@ -1,6 +1,6 @@
 <?php
 # Database Database Dump class
-# Version 1.1
+# Version 0.1
 # Writen By Kakhaber Kashmadze <info@soft.ge>
 # Licensed under MIT License
 

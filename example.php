@@ -1,7 +1,7 @@
 <?php
 ini_set("display_errors", 1);
 require_once "SqlDump.php";
-$sqlDumpCls=new Backup();
+$sqlDumpCls=new SqlDump();
 
 $dbParams=array("localhost","username","password","databasename");
 $sqlDumpCls->setDbParams($dbParams);

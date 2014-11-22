@@ -4,7 +4,7 @@
 # Writen By Kakhaber Kashmadze <info@soft.ge>
 # Licensed under MIT License
 
-# This version on Linux works with archive type gzip and with databases MySQL and PostgreSQL.
+# Script works with archive type gzip and with databases MySQL and PostgreSQL.
 # On windows environment path variable must be set for mysqldump and pg_dump
 
 class SqlDump{
